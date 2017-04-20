@@ -1,0 +1,12 @@
+v1
+
+[IFerr2DTMaterial]
+Assets/AssetPacks/Ferr/2DTerrain/TerrainMaterials/RockTerrainMaterial.prefab
+Assets/AssetPacks/Ferr/2DTerrain/TerrainMaterials/CaveTerrainMaterial.prefab
+Assets/AssetPacks/Ferr/2DTerrain/TerrainMaterials/PipeMaterial.prefab
+Assets/AssetPacks/Ferr/2DTerrain/TerrainMaterials/ForegroundTerrainMaterial.prefab
+Assets/AssetPacks/Ferr/2DTerrain/TerrainMaterials/ForestTerrainMaterial.prefab
+Assets/AssetPacks/Ferr/2DTerrain/TerrainMaterials/MossyTerrainMaterial.prefab
+Assets/AssetPacks/Ferr/2DTerrain/TerrainMaterials/SandTerrainMaterial.prefab
+
+[Ferr2DT_PathTerrain]
