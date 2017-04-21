@@ -48,14 +48,21 @@ public class BattleManager : MonoBehaviour
         currentTurnTaker = AllFighters[currentTurnTakerIndex];
         PanelToShowTurns.GetComponent<Image>().sprite = currentTurnTaker.portrait;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    public delegate void MakeDamageText(int damage, CharacterScript turnTaker, CharacterScript targetToAttack);
+
+    public MakeDamageText dmgCallback;
+    // Update is called once per frame
+    void Update ()
 	{
 
 	    if (Input.GetMouseButtonDown(1)) //Test activate next turn
 	    {
-            DamageTarget();
+	        dmgCallback = new MakeDamageText(DamageTarget); //Use a delegate to let the ability make a callback to the damage method in BattleManager.
+            //DamageTarget();
+            AbilityCoolDown abilityCoolDown = GetComponent<AbilityCoolDown>();
+            if (abilityCoolDown.CooldownIsComplete)
+            abilityCoolDown.FireAbility(currentTurnTaker.transform, selectedTargetToAttack.transform, dmgCallback);
 	    }
 	    if (Input.GetMouseButtonDown(0)) //Test activate next turn
         {
@@ -75,22 +82,22 @@ public class BattleManager : MonoBehaviour
 	}
 
 
-    public void DamageTarget()
+    public void DamageTarget(int damage, CharacterScript turnTaker, CharacterScript targetToAttack)
     {
         Debug.Log("Button was clicked");
-        if (selectedTargetToAttack != null)
+        if (targetToAttack != null)
         {
-            if (selectedTargetToAttack.hostility == currentTurnTaker.hostility)
+            if (targetToAttack.hostility == turnTaker.hostility)
             {
-                MakeFloatingTextAboveTarget(selectedTargetToAttack.transform, "Cannot attack an ally!", FriendlyTxtColor);
+                MakeFloatingTextAboveTarget(targetToAttack.transform, "Cannot attack an ally!", FriendlyTxtColor);
                 Debug.Log("Cannot attack an ally!");
                 return;
             }
-            Debug.Log("Target hp before attack: " + selectedTargetToAttack.hp);
-            int damage = currentTurnTaker.damage;
-            selectedTargetToAttack.hp -= damage;
-            MakeFloatingTextAboveTarget(selectedTargetToAttack.transform, damage + " damage taken!", HostileTxtColor);
-            Debug.Log("Target hp after attack: " + selectedTargetToAttack.hp);
+            Debug.Log("Target hp before attack: " + targetToAttack.hp);
+            // int damage = currentTurnTaker.damage;
+            targetToAttack.hp -= damage;
+            MakeFloatingTextAboveTarget(targetToAttack.transform, damage + " damage taken!", HostileTxtColor);
+            Debug.Log("Target hp after attack: " + targetToAttack.hp);
             NextTurn();
         }
         else
