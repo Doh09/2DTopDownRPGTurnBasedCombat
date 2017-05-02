@@ -27,6 +27,7 @@ public class ExplodeOnContact : MonoBehaviour
     void Update()
     {
         if (_target != null)
+        {
             if (Vector2.Distance(_target.position, transform.position) < _contactDistanceToTarget)
             {
                 //Explode
@@ -39,5 +40,6 @@ public class ExplodeOnContact : MonoBehaviour
             {
                 Debug.Log("No target set for ThrowingBomb");
             }
+        }
     }
 }

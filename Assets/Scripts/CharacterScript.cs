@@ -18,6 +18,7 @@ public class CharacterScript : MonoBehaviour
     public int intelligence = 10;
     public int strength = 10;
     public int damage = 20;
+    public List<Ability> abilities;
     public List<DamageAffector> damageAffectors = new List<DamageAffector>(); //A list of objects inhering from DamageAffector, this can be buffs, curses, armorrating etc.
 
     // Use this for initialization

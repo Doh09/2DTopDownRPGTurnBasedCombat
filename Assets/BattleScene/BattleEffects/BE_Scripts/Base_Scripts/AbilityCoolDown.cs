@@ -11,7 +11,7 @@ public class AbilityCoolDown : MonoBehaviour
     public Text coolDownTextDisplay;
 
     [SerializeField]
-    private Ability ability;
+    public Ability ability;
     [SerializeField]
     private GameObject weaponHolder;
     private Image myButtonImage;
