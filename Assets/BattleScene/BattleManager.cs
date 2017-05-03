@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
@@ -24,6 +25,7 @@ public class BattleManager : MonoBehaviour
     public CharacterScript selectedTargetToAttack;
 
     [Header("Turn handling")]
+    public bool PlayerTurn = false;
     public CharacterScript currentTurnTaker;
     private int currentTurnTakerIndex = 1;
     public GameObject PanelToShowTurns;
@@ -34,15 +36,33 @@ public class BattleManager : MonoBehaviour
     public List<CharacterScript> AllFriendlies = new List<CharacterScript>();
     [HideInInspector]
     public List<CharacterScript> AllEnemies = new List<CharacterScript>();
+    public CanvasGroup ActionMenu;
+    public bool enemyTurnInitialized = false;
 
     [Header("Abilities")]
     public Ability CurrentAbility;
     public Dropdown abilityDropDownMenu;
     private AbilityCoolDown abilityCoolDown;
+    [HideInInspector]
+    public MakeDamageText dmgCallback;
 
     void Awake()
     {
+        refreshDropDown();
+    }
+
+    private void refreshDropDown(int newValue = 0)
+    {
         abilityCoolDown = GetComponent<AbilityCoolDown>();
+        abilityDropDownMenu.value = newValue;
+        abilityDropDownMenu.RefreshShownValue();
+    }
+
+    public void setAbility()
+    {
+        int abilityNumber = abilityDropDownMenu.value;
+        CurrentAbility = currentTurnTaker.abilities[abilityNumber];
+        abilityCoolDown.ability = CurrentAbility;
     }
 
     // Use this for initialization
@@ -61,25 +81,47 @@ public class BattleManager : MonoBehaviour
         }
         currentTurnTaker = AllFighters[currentTurnTakerIndex];
         PanelToShowTurns.GetComponent<Image>().sprite = currentTurnTaker.portrait;
+        SetupAbilitiesDropDownMenu();
         setAbility();
+        checkPlayerTurn();
     }
+
+
 
     public delegate void MakeDamageText(int damage, CharacterScript turnTaker, CharacterScript targetToAttack);
 
-    public MakeDamageText dmgCallback;
+    
     // Update is called once per frame
     void Update()
     {
-
-        if (Input.GetMouseButtonDown(1)) //Test activate next turn
-        {
-            TriggerCurrentAbility();
-        }
+        ActionMenu.interactable = PlayerTurn;
         if (Input.GetMouseButtonDown(0)) //Test activate next turn
         {
             SelectTarget();
         }
+        if (!PlayerTurn && !enemyTurnInitialized && abilityCoolDown.CooldownIsComplete)
+            takeEnemyTurn();
+    }
 
+    private void takeEnemyTurn()
+    {
+        //Initialize enemy turn
+        enemyTurnInitialized = true;
+        //Select target
+        int targetInt = Random.Range(0, AllFriendlies.Count);
+        selectedTargetToAttack = AllFriendlies[targetInt];
+        //Select ability
+        int abilityInt = Random.Range(0, currentTurnTaker.abilities.Count);
+        CurrentAbility = currentTurnTaker.abilities[abilityInt];
+        //Trigger ability
+        TriggerCurrentAbility();
+    }
+
+    private void checkPlayerTurn()
+    {
+        //Player turn if a friendly characters turn.
+        PlayerTurn = currentTurnTaker.hostility == CharacterScript.HostilityToPlayer.Friendly;
+       
     }
 
     private void SelectTarget()
@@ -99,16 +141,9 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void setAbility()
-    {
-        int abilityNumber = abilityDropDownMenu.value;
-        CurrentAbility = currentTurnTaker.abilities[abilityNumber];
-        abilityCoolDown.ability = CurrentAbility;
-    }
-
-
     public void DamageTarget(int damage, CharacterScript turnTaker, CharacterScript targetToAttack)
     {
+        
         Debug.Log("Button was clicked");
         if (targetToAttack != null)
         {
@@ -127,7 +162,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            MakeFloatingTextAboveTarget(Camera.main.transform, "No target selected", NeutralTxtColor);
+            MakeFloatingTextAboveTarget(currentTurnTaker.transform, "No target selected", NeutralTxtColor);
             Debug.Log("No target selected");
         }
     }
@@ -172,14 +207,7 @@ public class BattleManager : MonoBehaviour
         Text flText = flTxtCanvas.GetComponentInChildren<Text>();
         flText.text = floatingText;
         flText.color = txtColor;
-        StartCoroutine(DestroyObjectAfterTime(flTxtCanvas, FloatingTxtFadeTime));
-    }
-
-    private IEnumerator DestroyObjectAfterTime(GameObject toDestroy, float delayTime)
-    {
-        yield return new WaitForSeconds(delayTime);
-        // Now do your thing here
-        Destroy(toDestroy);
+        Destroy(flTxtCanvas, FloatingTxtFadeTime);
     }
 
     void NextTurn()
@@ -193,11 +221,29 @@ public class BattleManager : MonoBehaviour
         i.color = Color.yellow;
         Debug.Log("currentTurnTakerIndex: " + currentTurnTakerIndex);
         Debug.Log("currentTurnTaker: " + currentTurnTaker.characterName);
-        abilityDropDownMenu.value = 0;
+        //Set abilities in menu
+        SetupAbilitiesDropDownMenu();
         setAbility();
+        checkPlayerTurn();
+        enemyTurnInitialized = false;
         //AddSpeedToTurns();
         //WhosTurnIsIt.Dequeue(); //remove a fighter from queue
         //WhosTurnIsItPortraits.Dequeue(); //remove a portrait from queue
+    }
+
+    void SetupAbilitiesDropDownMenu()
+    {
+        abilityDropDownMenu.value = 0;
+        List<Dropdown.OptionData> newOptions = new List<Dropdown.OptionData>();
+        foreach (var ability in currentTurnTaker.abilities)
+        {
+            Dropdown.OptionData newOption = new Dropdown.OptionData(ability.aName);
+            if (ability.aSprite != null)
+                newOption.image = ability.aSprite;
+            newOptions.Add(newOption);
+        }
+        abilityDropDownMenu.options = newOptions;
+        abilityDropDownMenu.RefreshShownValue();
     }
 
     float getSpeedValue(CharacterScript fighter)
