@@ -23,7 +23,8 @@ public class FollowPath : MonoBehaviour
     public int movementDirection = 1; //1 clockwise/forward || -1 counter clockwise/backwards
 
     public int movingTo = 0; //used to identify point in PathSequence we are moving to
-   
+    
+
 
     public enum PathTypes
     {

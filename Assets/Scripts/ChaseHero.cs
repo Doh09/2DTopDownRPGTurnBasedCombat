@@ -5,12 +5,11 @@ using UnityEngine;
 public class ChaseHero : MonoBehaviour
 {
     public float speed;
-
-    private Vector3 Player;
+    private Vector3 PlayerPosition;
     private Vector2 PlayerDirection;
-    private Rigidbody2D rb;
     private float xdif;
     private float ydif;
+    private bool chase = false;
 
 	// Use this for initialization
 	void Start () {
@@ -20,15 +19,37 @@ public class ChaseHero : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-	    Player = GameObject.Find("Player").transform.position;
+	    if (chase)
+	    {
+	        ChasePlayer();
+	    }
+	    chase = false;
+	}
 
-	    xdif = Player.x - transform.position.x;
-	    ydif = Player.y - transform.position.y;
+    void OnTriggerStay2D(Collider2D other)
+    {
+        Debug.Log("TRIIIIIIGGGERED!");
+        if (!other.CompareTag("Player"))
+        { 
+            return;
+            Debug.Log("return");
+        }
+        else
+        {
+            Debug.Log("true");
+            chase = true;
+        }
+    }
+
+    void ChasePlayer()
+    {
+        PlayerPosition = GameObject.Find("Player").transform.position;
+
+        xdif = PlayerPosition.x - transform.position.x;
+        ydif = PlayerPosition.y - transform.position.y;
 
         PlayerDirection = new Vector2(xdif, ydif);
 
-       // rb.AddForce(PlayerDirection.normalized * speed);
         transform.Translate(PlayerDirection.normalized * speed);
-
-	}
+    }
 }
