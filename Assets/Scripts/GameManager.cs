@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
 	    }
     }
 
-    public void ChangeToBattleScene(List<CharacterScript> characterScripts)
+    public void ChangeToBattleScene()
     {
         simpleBlit = camera.GetComponent<SimpleBlit>();
         simpleBlit.Activated = true;

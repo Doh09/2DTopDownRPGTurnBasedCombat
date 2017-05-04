@@ -32,12 +32,13 @@ public class NPCCollide : MonoBehaviour
         }
         else
         {
+            Debug.Log("true");
             _characterScripts = col.gameObject.GetComponentsInChildren<CharacterScript>();
 
             var player = transform.GetComponent<CharacterScript>();
             Debug.Log("Player -- " + "Armor: " + player.armorType.ToString()  +" SkinType: " + player.skinType.ToString());
             testmethod();
-            //gameManager.ChangeToBattleScene();
+            gameManager.ChangeToBattleScene();
         }
     }
 

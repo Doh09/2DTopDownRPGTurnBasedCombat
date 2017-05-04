@@ -28,7 +28,6 @@ public class ChaseHero : MonoBehaviour
 
     void OnTriggerStay2D(Collider2D other)
     {
-        Debug.Log("TRIIIIIIGGGERED!");
         if (!other.CompareTag("Player"))
         { 
             return;
@@ -36,7 +35,6 @@ public class ChaseHero : MonoBehaviour
         }
         else
         {
-            Debug.Log("true");
             chase = true;
         }
     }
