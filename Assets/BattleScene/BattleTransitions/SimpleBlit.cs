@@ -8,6 +8,14 @@ public class SimpleBlit : MonoBehaviour
     public bool Activated;
     public float TransitionSpeed;
     public float currentValue;
+    public float startValue = 1.1f;
+
+    void Awake()
+    {
+
+        currentValue = startValue;
+        TransitionMaterial.SetFloat("_Cutoff", startValue);
+    }
 
     void Update()
     {
