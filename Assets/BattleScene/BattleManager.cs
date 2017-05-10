@@ -23,6 +23,8 @@ public class BattleManager : MonoBehaviour
 
     [Header("Target handling")]
     public CharacterScript selectedTargetToAttack;
+    public GameObject pointerHand;
+    public Vector3 pointerHandOffset;
 
     [Header("Turn handling")]
     public bool PlayerTurn = false;
@@ -86,11 +88,13 @@ public class BattleManager : MonoBehaviour
         SetupAbilitiesDropDownMenu();
         setAbility();
         checkPlayerTurn();
+        pointerHand.transform.position = currentTurnTaker.transform.position + pointerHandOffset;
     }
     
     // Update is called once per frame
     void Update()
     {
+        pointerHand.transform.position = currentTurnTaker.transform.position + pointerHandOffset;
         ActionMenu.interactable = PlayerTurn;
         if (Input.GetMouseButtonDown(0)) //Test activate next turn
         {
