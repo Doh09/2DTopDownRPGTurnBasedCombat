@@ -108,20 +108,20 @@ public class BattleManager : MonoBehaviour
         int abilityInt = Random.Range(0, currentTurnTaker.abilities.Count);
         CurrentAbility = currentTurnTaker.abilities[abilityInt];
         //Find target
-        //if (CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Friendly) &&
-        //    CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Enemy))
-        //{
-        //    //Find a random target among battleparticipants
-        //    int targetInt = Random.Range(0, AllFighters.Count);
-        //    selectedTargetToAttack = AllFighters[targetInt];
-        //}
-        //else if (CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Friendly))
-        //{
-        //    //Find an NPC as target
-        //    int targetInt = Random.Range(0, AllEnemies.Count);
-        //    selectedTargetToAttack = AllEnemies[targetInt];
-        //}
-        //else if (CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Enemy))
+        if (CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Friendly) &&
+            CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Enemy))
+        {
+            //Find a random target among battleparticipants
+            int targetInt = Random.Range(0, AllFighters.Count);
+            selectedTargetToAttack = AllFighters[targetInt];
+        }
+        else if (CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Friendly))
+        {
+            //Find an NPC as target
+            int targetInt = Random.Range(0, AllEnemies.Count);
+            selectedTargetToAttack = AllEnemies[targetInt];
+        }
+        else if (CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Enemy))
         {
             //Find a player as target
             int targetInt = Random.Range(0, AllFriendlies.Count);
@@ -182,12 +182,19 @@ public class BattleManager : MonoBehaviour
     {
         if (checkBattleSelections())
         {
+            Animator anim = null;
+            if (currentTurnTaker.GetComponent<Animator>() != null)
+            {
+                anim = currentTurnTaker.GetComponent<Animator>();
+            }
+            if (anim != null)
+                anim.SetTrigger("UseAbility");
             if (!CurrentAbility.canTarget.Contains(selectedTargetToAttack.hostility) && PlayerTurn) //only do check on playerturn, as enemy turn has check when selecting target.
             {
                 MakeFloatingTextAboveTarget(selectedTargetToAttack.transform, "Invalid target!", NeutralTxtColor);
                 return;
             }
-
+            abilityCoolDown.ability = CurrentAbility;
             if (abilityCoolDown.CooldownIsComplete)
                 abilityCoolDown.FireAbility(currentTurnTaker.transform, selectedTargetToAttack.transform, dmgCallback);
         }

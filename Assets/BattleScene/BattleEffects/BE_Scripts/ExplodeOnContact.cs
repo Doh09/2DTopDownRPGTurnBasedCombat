@@ -32,6 +32,13 @@ public class ExplodeOnContact : MonoBehaviour
             if (Vector2.Distance(_target.position, transform.position) < _contactDistanceToTarget)
             {
                 //Explode
+                Animator anim = null;
+                if (_target.GetComponent<Animator>() != null)
+                {
+                    anim = _target.GetComponent<Animator>();
+                    anim.SetTrigger("WasHit");
+                }
+                
                 var explosion = Instantiate(Explosion, transform, true);
                 explosion.transform.position = transform.position;
                 explosion.transform.SetParent(null);
