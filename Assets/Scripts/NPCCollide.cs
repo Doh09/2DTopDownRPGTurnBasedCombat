@@ -7,7 +7,7 @@ public class NPCCollide : MonoBehaviour
 {
 
     private static GameManager gameManager;
-    private CharacterScript[] _characterScripts;
+    private List<CharacterScript> _characterScripts;
     
 
     // Use this for initialization
@@ -33,21 +33,11 @@ public class NPCCollide : MonoBehaviour
         else
         {
             Debug.Log("true");
-            _characterScripts = col.gameObject.GetComponentsInChildren<CharacterScript>();
-
-            var player = transform.GetComponent<CharacterScript>();
-            Debug.Log("Player -- " + "Armor: " + player.armorType.ToString()  +" SkinType: " + player.skinType.ToString());
-            testmethod();
-            gameManager.ChangeToBattleScene();
+            _characterScripts = new List<CharacterScript>(col.gameObject.GetComponentsInChildren<CharacterScript>());
+            _characterScripts.Add(transform.GetComponent<CharacterScript>());
+            gameManager.ChangeToBattleScene(_characterScripts);
         }
     }
 
-    void testmethod()
-    {
-        foreach (var bitches in _characterScripts)
-        {
-            Debug.Log("Enemy Name: " + bitches.characterName);
-        }
-    }
 
 }

@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     private Camera camera;
     private bool sceneChangeInitialized = false;
     private SimpleBlit simpleBlit;
-    private CharacterScript characterScript;
+    private List<CharacterScript> _charactersStats;
 
     //Awake is always called before any Start functions
     void Awake()
@@ -36,19 +36,26 @@ public class GameManager : MonoBehaviour
 	
 	// Update is called once per frame
 	void Update () {
-	    if (sceneChangeInitialized && simpleBlit.currentValue >= 1f)
-	    {
+        if (sceneChangeInitialized && simpleBlit.currentValue >= 1f)
+        {
             SceneManager.LoadScene("BattleScene");
-	        sceneChangeInitialized = false;
-	    }
+            sceneChangeInitialized = false;
+        }
     }
 
-    public void ChangeToBattleScene()
+    public void ChangeToBattleScene(List<CharacterScript> cStats)
     {
+        _charactersStats = cStats;
         simpleBlit = camera.GetComponent<SimpleBlit>();
         simpleBlit.Activated = true;
-        Debug.Log("LoadMe");
         sceneChangeInitialized = true;
+        Debug.Log("LoadMe");
     }
-    
+
+    public List<CharacterScript> GetCharactersScripts()
+    {
+        
+        return _charactersStats;    
+    }
+
 }

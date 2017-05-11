@@ -46,9 +46,14 @@ public class BattleManager : MonoBehaviour
     [HideInInspector]
     public MakeDamageText dmgCallback;
 
+    public List<CharacterScript> _CharacterScriptsFromMap;
+
     void Awake()
     {
         refreshDropDown();
+        var gameManager = GameObject.Find("GameManager");
+        var gameManagerScript = gameManager.GetComponent<GameManager>();
+         _CharacterScriptsFromMap = gameManagerScript.GetCharactersScripts();
     }
 
     private void refreshDropDown(int newValue = 0)
