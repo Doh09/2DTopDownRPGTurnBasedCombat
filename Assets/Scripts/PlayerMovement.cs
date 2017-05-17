@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using CnControls;
+using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
 
-		Vector2 movement_vector = new Vector2(CnControls.CnInputManager.GetAxisRaw("Horizontal"), CnControls.CnInputManager.GetAxisRaw("Vertical"));
+		Vector2 movement_vector = new Vector2(CnInputManager.GetAxisRaw("Horizontal"), CnInputManager.GetAxisRaw("Vertical"));
 
         if (movement_vector != Vector2.zero)
         {

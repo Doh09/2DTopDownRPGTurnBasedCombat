@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
+
 
 public class Warp : MonoBehaviour {
 
@@ -12,7 +13,7 @@ public class Warp : MonoBehaviour {
 	//public float posZ;
 
 	void OnTriggerEnter2D(Collider2D other){
-		EditorSceneManager.LoadScene (scene);
+        SceneManager.LoadScene (scene);
 		PlayerPrefs.SetFloat ("x", posX);
 		PlayerPrefs.SetFloat ("y", posY);
 		PlayerPrefs.SetFloat ("z", 0);

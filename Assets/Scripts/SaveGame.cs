@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
+
 
 public class SaveGame : MonoBehaviour
 {
@@ -20,10 +21,10 @@ public class SaveGame : MonoBehaviour
 		PlayerPrefs.SetFloat ("y", player.position.y);
 		PlayerPrefs.SetFloat ("z", player.position.z);
 		PlayerPrefs.SetFloat ("Cam_y", player.eulerAngles.y);
-		PlayerPrefs.SetInt ("map", EditorSceneManager.GetActiveScene ().buildIndex);
+		PlayerPrefs.SetInt ("map", SceneManager.GetActiveScene ().buildIndex);
 		if (quit) {
 			Time.timeScale = 1;
-			EditorSceneManager.LoadScene ("Menu");
+            SceneManager.LoadScene ("Menu");
 		}
 	}
 
