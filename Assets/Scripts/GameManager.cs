@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour
         sceneToLoadTo = sceneToChangeTo;
         if (camera == null)
             camera = Camera.main;
+        if (camera == null)
+            camera = Camera.current;
         simpleBlit = camera.GetComponent<SimpleBlit>();
         simpleBlit.Activated = true;
         Debug.Log("LoadMe");

@@ -292,7 +292,7 @@ public class BattleManager : MonoBehaviour
             Debug.Log("You won, well done!");
             bigInfoText.gameObject.SetActive(true);
             bigInfoText.text = "You won, well done!";
-            StartCoroutine(changeScene("MapScene", 3));
+            StartCoroutine(changeScene("Main", 3));
         }
         else if (AllFriendlies.Count == 0)
         {
