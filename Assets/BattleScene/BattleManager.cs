@@ -292,7 +292,7 @@ public class BattleManager : MonoBehaviour
             Debug.Log("You won, well done!");
             bigInfoText.gameObject.SetActive(true);
             bigInfoText.text = "You won, well done!";
-            StartCoroutine(changeScene(3));
+            StartCoroutine(changeScene("MapScene", 3));
         }
         else if (AllFriendlies.Count == 0)
         {
@@ -302,10 +302,10 @@ public class BattleManager : MonoBehaviour
         } 
     }
 
-    IEnumerator changeScene(int waitForSeconds = 3)
+    IEnumerator changeScene(string sceneToChangeTo, int waitForSeconds = 3)
     {
         yield return new WaitForSeconds(waitForSeconds);
-        GameManager.instance.ChangeToNewScene("MapScene");
+        GameManager.instance.ChangeToNewScene(sceneToChangeTo);
     }
 
     void SetupAbilitiesDropDownMenu()
