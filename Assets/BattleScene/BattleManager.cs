@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -29,7 +31,7 @@ public class BattleManager : MonoBehaviour
     [Header("Turn handling")]
     public bool PlayerTurn = false;
     public CharacterScript currentTurnTaker;
-    private int currentTurnTakerIndex = 1;
+    private int currentTurnTakerIndex = 0;
     public GameObject PanelToShowTurns;
     //public Queue<CharacterScript> WhosTurnIsIt = new Queue<CharacterScript>();
     //public Queue<GameObject> WhosTurnIsItPortraits = new Queue<GameObject>();
@@ -38,8 +40,11 @@ public class BattleManager : MonoBehaviour
     public List<CharacterScript> AllFriendlies = new List<CharacterScript>();
     [HideInInspector]
     public List<CharacterScript> AllEnemies = new List<CharacterScript>();
+    [HideInInspector]
+    public List<CharacterScript> DeadFighters = new List<CharacterScript>();
     public CanvasGroup ActionMenu;
     public bool enemyTurnInitialized = false;
+    public TextMeshProUGUI bigInfoText;
 
     [Header("Abilities")]
     public Ability CurrentAbility;
@@ -172,6 +177,11 @@ public class BattleManager : MonoBehaviour
             { //if healed
             MakeFloatingTextAboveTarget(targetToAttack.transform, (Mathf.Abs(damage)) + " health healed!", FriendlyTxtColor);
             }
+            if (targetToAttack.hp <= 0f)
+            {
+                //Target died
+                SetPlayerDead(targetToAttack);
+            }
             Debug.Log("Target hp after attack: " + targetToAttack.hp);
             NextTurn();
         }
@@ -257,6 +267,45 @@ public class BattleManager : MonoBehaviour
         //AddSpeedToTurns();
         //WhosTurnIsIt.Dequeue(); //remove a fighter from queue
         //WhosTurnIsItPortraits.Dequeue(); //remove a portrait from queue
+    }
+
+    void SetPlayerDead(CharacterScript fighter)
+    {
+        fighter.GetComponent<Animator>().SetTrigger("die");
+        if (fighter.hostility == CharacterScript.HostilityToPlayer.Friendly)
+        {
+            //Remove from friendly queue
+            AllFriendlies.RemoveAll(x => x.GetComponent<CharacterScript>().Equals(fighter));
+        }
+        else if (fighter.hostility == CharacterScript.HostilityToPlayer.Enemy)
+        {
+            //Remove from enemy queue
+            AllEnemies.RemoveAll(x => x.GetComponent<CharacterScript>().Equals(fighter));
+        }
+        AllFighters.RemoveAll(x => x.GetComponent<CharacterScript>().Equals(fighter)); //Remove from combat
+        //Add to queue of dead guys
+        DeadFighters.Add(fighter);
+        //If allEnemies.length or allFriendlies.length == 0
+        if (AllEnemies.Count == 0)
+        {
+            //Win
+            Debug.Log("You won, well done!");
+            bigInfoText.gameObject.SetActive(true);
+            bigInfoText.text = "You won, well done!";
+            StartCoroutine(changeScene(3));
+        }
+        else if (AllFriendlies.Count == 0)
+        {
+            //Lose
+            Debug.Log("You lost, better luck next time!");
+            bigInfoText.text = "You lost, better luck next time!";
+        } 
+    }
+
+    IEnumerator changeScene(int waitForSeconds = 3)
+    {
+        yield return new WaitForSeconds(waitForSeconds);
+        GameManager.instance.ChangeToNewScene("MapScene");
     }
 
     void SetupAbilitiesDropDownMenu()

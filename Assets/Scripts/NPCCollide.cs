@@ -38,7 +38,7 @@ public class NPCCollide : MonoBehaviour
             var player = transform.GetComponent<CharacterScript>();
             Debug.Log("Player -- " + "Armor: " + player.armorType.ToString()  +" SkinType: " + player.skinType.ToString());
             testmethod();
-            gameManager.ChangeToBattleScene();
+            gameManager.ChangeToNewScene();
         }
     }
 
