@@ -38,7 +38,6 @@ public class NPCCollide : MonoBehaviour
             for (int i = 0; i < col.transform.childCount; i++)
             {
                 col.transform.GetChild(i).gameObject.SetActive(true);
-                Debug.Log(i);
             }
             DontDestroyOnLoad(gameObject.transform);    
             DontDestroyOnLoad(col.transform.parent.gameObject);

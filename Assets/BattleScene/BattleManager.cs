@@ -73,7 +73,7 @@ public class BattleManager : MonoBehaviour
                 AllFighters.Add(ft.GetComponent<CharacterScript>());
             }
         }
-
+        
         //foreach (var battleParticipant in gameManagerScript.GetCharactersTransforms())
         //{
         //    GameObject character = Instantiate(battleParticipant.gameObject, transform, true);
