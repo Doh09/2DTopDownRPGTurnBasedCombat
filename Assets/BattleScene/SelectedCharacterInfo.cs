@@ -8,6 +8,7 @@ public class SelectedCharacterInfo : MonoBehaviour
 
     public BattleManager bm;
 
+    public GameObject display_Name;
     public GameObject display_Str;
     public GameObject display_Int;
     public GameObject display_Spd;
@@ -25,6 +26,8 @@ public class SelectedCharacterInfo : MonoBehaviour
         if (bm.selectedTargetToAttack != null)
         {
             //Display target info
+            //Name
+            display_Name.GetComponent<Text>().text = bm.selectedTargetToAttack.characterName;
             //Strength
             display_Str.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.strength+"";
             //Intelligence

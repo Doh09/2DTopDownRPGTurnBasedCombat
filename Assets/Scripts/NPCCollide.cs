@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,7 @@ public class NPCCollide : MonoBehaviour
 {
 
     private static GameManager gameManager;
-    private List<Transform> _characterObjects;
+    private List<Transform> _characterTransforms;
     private GameObject enemy;
     
 
@@ -36,18 +37,23 @@ public class NPCCollide : MonoBehaviour
 
             for (int i = 0; i < col.transform.childCount; i++)
             {
-                transform.GetChild(i).gameObject.SetActive(true);
+                col.transform.GetChild(i).gameObject.SetActive(true);
                 Debug.Log(i);
             }
-            //DontDestroyOnLoad(gameObject.transform);    
-            //DontDestroyOnLoad(col.transform.parent.gameObject);
+            DontDestroyOnLoad(gameObject.transform);    
+            DontDestroyOnLoad(col.transform.parent.gameObject);
             
-            //_characterObjects = new List<Transform>(col.gameObject.GetComponentsInChildren<Transform>());
-            //_characterObjects.Add(transform.GetComponent<Transform>());
-            //gameObject.SetActive(false);
-            //col.transform.parent.gameObject.SetActive(false);
-            //col.gameObject.SetActive(false);
-            //gameManager.ChangeToBattleScene(_characterObjects);
+            _characterTransforms = new List<Transform>(col.gameObject.GetComponentsInChildren<Transform>());
+            _characterTransforms.Add(transform.GetComponent<Transform>());
+
+            GameManager.instance.StoreFightersInGameManager(_characterTransforms);
+
+
+            col.transform.parent.gameObject.SetActive(false);
+            gameObject.SetActive(false);
+
+            GameManager.instance.ChangeToNewScene("BattleScene");
+
         }
     }
 
