@@ -7,7 +7,8 @@ public class NPCCollide : MonoBehaviour
 {
 
     private static GameManager gameManager;
-    private List<CharacterScript> _characterScripts;
+    private List<Transform> _characterObjects;
+    private GameObject enemy;
     
 
     // Use this for initialization
@@ -25,17 +26,28 @@ public class NPCCollide : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log("trigger");
+       
         if (!col.CompareTag("Enemy"))
         {
             return;
         }
         else
         {
-            Debug.Log("true");
-            _characterScripts = new List<CharacterScript>(col.gameObject.GetComponentsInChildren<CharacterScript>());
-            _characterScripts.Add(transform.GetComponent<CharacterScript>());
-            gameManager.ChangeToBattleScene(_characterScripts);
+
+            for (int i = 0; i < col.transform.childCount; i++)
+            {
+                transform.GetChild(i).gameObject.SetActive(true);
+                Debug.Log(i);
+            }
+            //DontDestroyOnLoad(gameObject.transform);    
+            //DontDestroyOnLoad(col.transform.parent.gameObject);
+            
+            //_characterObjects = new List<Transform>(col.gameObject.GetComponentsInChildren<Transform>());
+            //_characterObjects.Add(transform.GetComponent<Transform>());
+            //gameObject.SetActive(false);
+            //col.transform.parent.gameObject.SetActive(false);
+            //col.gameObject.SetActive(false);
+            //gameManager.ChangeToBattleScene(_characterObjects);
         }
     }
 

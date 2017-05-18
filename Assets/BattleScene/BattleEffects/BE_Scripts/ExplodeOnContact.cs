@@ -28,17 +28,21 @@ public class ExplodeOnContact : MonoBehaviour
     {
         if (_target != null)
         {
+            //Check if within distance of target
             if (Vector2.Distance(_target.position, transform.position) < _contactDistanceToTarget)
             {
                 //Explode
+                Animator anim = null;
+                if (_target.GetComponent<Animator>() != null)
+                {
+                    anim = _target.GetComponent<Animator>();
+                    anim.SetTrigger("WasHit");
+                }
+                
                 var explosion = Instantiate(Explosion, transform, true);
                 explosion.transform.position = transform.position;
                 explosion.transform.SetParent(null);
                 Destroy(gameObject);
-            }
-            else
-            {
-                Debug.Log("No target set for ThrowingBomb");
             }
         }
     }

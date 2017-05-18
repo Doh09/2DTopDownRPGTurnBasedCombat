@@ -23,6 +23,8 @@ public class BattleManager : MonoBehaviour
 
     [Header("Target handling")]
     public CharacterScript selectedTargetToAttack;
+    public GameObject pointerHand;
+    public Vector3 pointerHandOffset;
 
     [Header("Turn handling")]
     public bool PlayerTurn = false;
@@ -44,16 +46,27 @@ public class BattleManager : MonoBehaviour
     public Dropdown abilityDropDownMenu;
     private AbilityCoolDown abilityCoolDown;
     [HideInInspector]
+    public delegate void MakeDamageText(int damage, CharacterScript turnTaker, CharacterScript targetToAttack);
     public MakeDamageText dmgCallback;
 
     public List<CharacterScript> _CharacterScriptsFromMap;
 
     void Awake()
     {
+        dmgCallback = new MakeDamageText(DamageTarget); //Use a delegate to let the ability make a callback to the damage method in BattleManager.
         refreshDropDown();
         var gameManager = GameObject.Find("GameManager");
         var gameManagerScript = gameManager.GetComponent<GameManager>();
-         _CharacterScriptsFromMap = gameManagerScript.GetCharactersScripts();
+        foreach (var battleParticipant in gameManagerScript.GetCharactersObjects())
+        {
+            GameObject character = Instantiate(battleParticipant.gameObject, transform, true);
+            character.transform.parent = transform;
+            AllFighters.Add(battleParticipant.GetComponent<CharacterScript>());
+        }
+        // AllFighters = ;
+
+
+
     }
 
     private void refreshDropDown(int newValue = 0)
@@ -89,16 +102,13 @@ public class BattleManager : MonoBehaviour
         SetupAbilitiesDropDownMenu();
         setAbility();
         checkPlayerTurn();
+        pointerHand.transform.position = currentTurnTaker.transform.position + pointerHandOffset;
     }
-
-
-
-    public delegate void MakeDamageText(int damage, CharacterScript turnTaker, CharacterScript targetToAttack);
-
     
     // Update is called once per frame
     void Update()
     {
+        pointerHand.transform.position = currentTurnTaker.transform.position + pointerHandOffset;
         ActionMenu.interactable = PlayerTurn;
         if (Input.GetMouseButtonDown(0)) //Test activate next turn
         {
@@ -112,12 +122,29 @@ public class BattleManager : MonoBehaviour
     {
         //Initialize enemy turn
         enemyTurnInitialized = true;
-        //Select target
-        int targetInt = Random.Range(0, AllFriendlies.Count);
-        selectedTargetToAttack = AllFriendlies[targetInt];
         //Select ability
         int abilityInt = Random.Range(0, currentTurnTaker.abilities.Count);
         CurrentAbility = currentTurnTaker.abilities[abilityInt];
+        //Find target
+        if (CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Friendly) &&
+            CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Enemy))
+        {
+            //Find a random target among battleparticipants
+            int targetInt = Random.Range(0, AllFighters.Count);
+            selectedTargetToAttack = AllFighters[targetInt];
+        }
+        else if (CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Friendly))
+        {
+            //Find an NPC as target
+            int targetInt = Random.Range(0, AllEnemies.Count);
+            selectedTargetToAttack = AllEnemies[targetInt];
+        }
+        else if (CurrentAbility.canTarget.Contains(CharacterScript.HostilityToPlayer.Enemy))
+        {
+            //Find a player as target
+            int targetInt = Random.Range(0, AllFriendlies.Count);
+            selectedTargetToAttack = AllFriendlies[targetInt];
+        }
         //Trigger ability
         TriggerCurrentAbility();
     }
@@ -126,7 +153,6 @@ public class BattleManager : MonoBehaviour
     {
         //Player turn if a friendly characters turn.
         PlayerTurn = currentTurnTaker.hostility == CharacterScript.HostilityToPlayer.Friendly;
-       
     }
 
     private void SelectTarget()
@@ -142,26 +168,24 @@ public class BattleManager : MonoBehaviour
         else
         {
             Debug.Log("No hit/target found");
-
         }
     }
 
     public void DamageTarget(int damage, CharacterScript turnTaker, CharacterScript targetToAttack)
-    {
-        
+    {      
         Debug.Log("Button was clicked");
         if (targetToAttack != null)
         {
-            if (targetToAttack.hostility == turnTaker.hostility)
-            {
-                MakeFloatingTextAboveTarget(targetToAttack.transform, "Cannot attack an ally!", FriendlyTxtColor);
-                Debug.Log("Cannot attack an ally!");
-                return;
-            }
             Debug.Log("Target hp before attack: " + targetToAttack.hp);
             // int damage = currentTurnTaker.damage;
             targetToAttack.hp -= damage;
-            MakeFloatingTextAboveTarget(targetToAttack.transform, damage + " damage taken!", HostileTxtColor);
+            if (damage >= 0)
+            //if damage taken
+            MakeFloatingTextAboveTarget(targetToAttack.transform, damage + " health lost!", HostileTxtColor);
+            else
+            { //if healed
+            MakeFloatingTextAboveTarget(targetToAttack.transform, (Mathf.Abs(damage)) + " health healed!", FriendlyTxtColor);
+            }
             Debug.Log("Target hp after attack: " + targetToAttack.hp);
             NextTurn();
         }
@@ -176,7 +200,19 @@ public class BattleManager : MonoBehaviour
     {
         if (checkBattleSelections())
         {
-            dmgCallback = new MakeDamageText(DamageTarget); //Use a delegate to let the ability make a callback to the damage method in BattleManager.
+            Animator anim = null;
+            if (currentTurnTaker.GetComponent<Animator>() != null)
+            {
+                anim = currentTurnTaker.GetComponent<Animator>();
+            }
+            if (anim != null)
+                anim.SetTrigger("UseAbility");
+            if (!CurrentAbility.canTarget.Contains(selectedTargetToAttack.hostility) && PlayerTurn) //only do check on playerturn, as enemy turn has check when selecting target.
+            {
+                MakeFloatingTextAboveTarget(selectedTargetToAttack.transform, "Invalid target!", NeutralTxtColor);
+                return;
+            }
+            abilityCoolDown.ability = CurrentAbility;
             if (abilityCoolDown.CooldownIsComplete)
                 abilityCoolDown.FireAbility(currentTurnTaker.transform, selectedTargetToAttack.transform, dmgCallback);
         }
@@ -199,6 +235,7 @@ public class BattleManager : MonoBehaviour
             MakeFloatingTextAboveTarget(currentTurnTaker.transform, "No ability selected", NeutralTxtColor);
             return false;
         }
+
         return true;
     }
 

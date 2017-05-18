@@ -8,7 +8,8 @@ public class MoveTxt : MonoBehaviour
     public float moveSpeed = 0.01f;
     [Tooltip("Lower is faster")]
     public float fadeSpeed = 0.98f;
-	// Use this for initialization
+
+    // Use this for initialization
 	void Start ()
 	{
         cRenderer = GetComponentInChildren<CanvasRenderer>();
