@@ -54,10 +54,36 @@ public class BattleManager : MonoBehaviour
     public delegate void MakeDamageText(int damage, CharacterScript turnTaker, CharacterScript targetToAttack);
     public MakeDamageText dmgCallback;
 
+    public List<CharacterScript> _CharacterScriptsFromMap;
+
     void Awake()
     {
         dmgCallback = new MakeDamageText(DamageTarget); //Use a delegate to let the ability make a callback to the damage method in BattleManager.
         refreshDropDown();
+        var gameManager = GameObject.Find("GameManager");
+        var gameManagerScript = gameManager.GetComponent<GameManager>();
+
+        var fighterTransforms = GameManager.instance.GetCharactersTransforms();
+        Debug.Log("battleManager");
+
+        foreach (var ft in fighterTransforms)
+        {
+            if (ft.tag == "BattleParticipant" || ft.tag == "Player")
+            {
+                AllFighters.Add(ft.GetComponent<CharacterScript>());
+            }
+        }
+        
+        //foreach (var battleParticipant in gameManagerScript.GetCharactersTransforms())
+        //{
+        //    GameObject character = Instantiate(battleParticipant.gameObject, transform, true);
+        //    character.transform.parent = transform;
+        //    AllFighters.Add(battleParticipant.GetComponent<CharacterScript>());
+        //}
+        // AllFighters = ;
+
+
+
     }
 
     private void refreshDropDown(int newValue = 0)

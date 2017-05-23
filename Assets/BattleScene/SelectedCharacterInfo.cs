@@ -23,20 +23,23 @@ public class SelectedCharacterInfo : MonoBehaviour
 	// Update is called once per frame
     void LateUpdate()
     {
-        if (bm.selectedTargetToAttack != null)
+        if (bm != null)
         {
-            //Display target info
-            //Name
-            display_Name.GetComponent<Text>().text = bm.selectedTargetToAttack.characterName;
-            //Strength
-            display_Str.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.strength+"";
-            //Intelligence
-            display_Int.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.intelligence + "";
-            //Speed
-            display_Spd.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.speed + "";
-            //Portrait
-            display_portrait.GetComponentInChildren<Image>().sprite = bm.selectedTargetToAttack.portrait;
-            //Healthbar
+            if (bm.selectedTargetToAttack != null)
+            {
+                //Display target info
+                //Name
+                display_Name.GetComponent<Text>().text = bm.selectedTargetToAttack.characterName;
+                //Strength
+                display_Str.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.strength + "";
+                //Intelligence
+                display_Int.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.intelligence + "";
+                //Speed
+                display_Spd.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.speed + "";
+                //Portrait
+                display_portrait.GetComponentInChildren<Image>().sprite = bm.selectedTargetToAttack.portrait;
+                //Healthbar
+            }
         }
     }
 }

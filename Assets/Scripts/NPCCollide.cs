@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,7 +8,8 @@ public class NPCCollide : MonoBehaviour
 {
 
     private static GameManager gameManager;
-    private CharacterScript[] _characterScripts;
+    private List<Transform> _characterTransforms;
+    private GameObject enemy;
     
 
     // Use this for initialization
@@ -25,29 +27,34 @@ public class NPCCollide : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log("trigger");
+       
         if (!col.CompareTag("Enemy"))
         {
             return;
         }
         else
         {
-            Debug.Log("true");
-            _characterScripts = col.gameObject.GetComponentsInChildren<CharacterScript>();
 
-            var player = transform.GetComponent<CharacterScript>();
-            Debug.Log("Player -- " + "Armor: " + player.armorType.ToString()  +" SkinType: " + player.skinType.ToString());
-            testmethod();
+            for (int i = 0; i < col.transform.childCount; i++)
+            {
+                col.transform.GetChild(i).gameObject.SetActive(true);
+            }
+            DontDestroyOnLoad(gameObject.transform);    
+            DontDestroyOnLoad(col.transform.parent.gameObject);
+            
+            _characterTransforms = new List<Transform>(col.gameObject.GetComponentsInChildren<Transform>());
+            _characterTransforms.Add(transform.GetComponent<Transform>());
+
+            GameManager.instance.StoreFightersInGameManager(_characterTransforms);
+
+
+            col.transform.parent.gameObject.SetActive(false);
+            gameObject.SetActive(false);
+
             GameManager.instance.ChangeToNewScene("BattleScene");
+
         }
     }
 
-    void testmethod()
-    {
-        foreach (var bitches in _characterScripts)
-        {
-            Debug.Log("Enemy Name: " + bitches.characterName);
-        }
-    }
 
 }

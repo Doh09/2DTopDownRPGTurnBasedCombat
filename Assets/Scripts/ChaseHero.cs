@@ -31,7 +31,7 @@ public class ChaseHero : MonoBehaviour
         if (!other.CompareTag("Player"))
         { 
             return;
-            Debug.Log("return");
+           
         }
         else
         {
