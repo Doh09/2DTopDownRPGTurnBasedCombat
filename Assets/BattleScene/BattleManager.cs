@@ -31,7 +31,7 @@ public class BattleManager : MonoBehaviour
     [Header("Turn handling")]
     public bool PlayerTurn = false;
     public CharacterScript currentTurnTaker;
-    private int currentTurnTakerIndex = 0;
+    private int currentTurnTakerIndex = 1;
     public GameObject PanelToShowTurns;
     //public Queue<CharacterScript> WhosTurnIsIt = new Queue<CharacterScript>();
     //public Queue<GameObject> WhosTurnIsItPortraits = new Queue<GameObject>();
@@ -55,55 +55,64 @@ public class BattleManager : MonoBehaviour
     public MakeDamageText dmgCallback;
 
     public List<CharacterScript> _CharacterScriptsFromMap;
+    private Transform enemyParent;
+    private Transform playerParent;
+
+    private GameObject[] friendlyBattlePositions;
+    private GameObject[] enemyBattlePositions;
+    private int friendlybpIndex = 0;
+    private int enemybpIndex = 0;
 
     void Awake()
     {
-        dmgCallback = new MakeDamageText(DamageTarget); //Use a delegate to let the ability make a callback to the damage method in BattleManager.
-        refreshDropDown();
-        var gameManager = GameObject.Find("GameManager");
-        var gameManagerScript = gameManager.GetComponent<GameManager>();
-
+        friendlyBattlePositions = GameObject.FindGameObjectsWithTag("FriendlyBattlePosition");
+        enemyBattlePositions = GameObject.FindGameObjectsWithTag("EnemyBattlePosition");
+        if (bigInfoText == null)
+            GameObject.Find("bigInfoText").GetComponent<TextMeshProUGUI>();
+        bigInfoText.text = "";
+        //Load in all fighters
         var fighterTransforms = GameManager.instance.GetCharactersTransforms();
         Debug.Log("battleManager");
 
         foreach (var ft in fighterTransforms)
         {
-            if (ft.tag == "BattleParticipant" || ft.tag == "Player")
+            if (ft.tag == "BattleParticipant")
             {
                 AllFighters.Add(ft.GetComponent<CharacterScript>());
+                ft.gameObject.SetActive(true);
+                ft.parent = null;
+                if (ft.GetComponent<CharacterScript>().hostility == CharacterScript.HostilityToPlayer.Friendly)
+                {
+                    //Give friendly battle position
+                    ft.position = friendlyBattlePositions[friendlybpIndex].transform.position;
+                    ft.localRotation = Quaternion.Euler(0, 180, 0); //turn right
+                    friendlybpIndex++;
+                    friendlybpIndex = friendlybpIndex % friendlyBattlePositions.Length;
+                }
+                else if (ft.GetComponent<CharacterScript>().hostility == CharacterScript.HostilityToPlayer.Enemy)
+                {
+                    //Give enemy battle position
+                    ft.position = enemyBattlePositions[enemybpIndex].transform.position;
+                    ft.localRotation = Quaternion.Euler(0, 0, 0); //turn left
+                    enemybpIndex++;
+                    enemybpIndex = enemybpIndex % enemyBattlePositions.Length;
+                }
+            }
+            else if (ft.CompareTag("Enemy"))
+            {
+                enemyParent = ft;
+                
+            }
+            else if (ft.CompareTag("Player"))
+            {
+                playerParent = ft;
             }
         }
-        
-        //foreach (var battleParticipant in gameManagerScript.GetCharactersTransforms())
-        //{
-        //    GameObject character = Instantiate(battleParticipant.gameObject, transform, true);
-        //    character.transform.parent = transform;
-        //    AllFighters.Add(battleParticipant.GetComponent<CharacterScript>());
-        //}
-        // AllFighters = ;
-
-
-
-    }
-
-    private void refreshDropDown(int newValue = 0)
-    {
-        abilityCoolDown = GetComponent<AbilityCoolDown>();
-        abilityDropDownMenu.value = newValue;
-        abilityDropDownMenu.RefreshShownValue();
-    }
-
-    public void setAbility()
-    {
-        int abilityNumber = abilityDropDownMenu.value;
-        CurrentAbility = currentTurnTaker.abilities[abilityNumber];
-        abilityCoolDown.ability = CurrentAbility;
-    }
-
-    // Use this for initialization
-    void Start()
-    {
-        foreach (var fighter in AllFighters) //Sort fighters into friendlies and enemies respectively.
+        //deactivate parent objects during combat.
+        enemyParent.gameObject.SetActive(false);
+        playerParent.gameObject.SetActive(false);
+        //Sort fighters into friendlies and enemies respectively, for AI purposes.
+        foreach (var fighter in AllFighters) 
         {
             if (fighter.hostility == CharacterScript.HostilityToPlayer.Enemy)
             {
@@ -114,12 +123,51 @@ public class BattleManager : MonoBehaviour
                 AllFriendlies.Add(fighter);
             }
         }
-        currentTurnTaker = AllFighters[currentTurnTakerIndex];
+        currentTurnTaker = AllFighters[0];
         PanelToShowTurns.GetComponent<Image>().sprite = currentTurnTaker.portrait;
+        if (pointerHand == null)
+            pointerHand = GameObject.FindGameObjectWithTag("PointerHand");
+        dmgCallback = new MakeDamageText(DamageTarget); //Use a delegate to let the ability make a callback to the damage method in BattleManager.
+
+   //     var gameManager = GameObject.Find("GameManager");
+    //    var gameManagerScript = gameManager.GetComponent<GameManager>();
+
+
+        
+        //foreach (var battleParticipant in gameManagerScript.GetCharactersTransforms())
+        //{
+        //    GameObject character = Instantiate(battleParticipant.gameObject, transform, true);
+        //    character.transform.parent = transform;
+        //    AllFighters.Add(battleParticipant.GetComponent<CharacterScript>());
+        //}
+        // AllFighters = ;
+
+    }
+
+    // Use this for initialization
+    void Start()
+    {
         SetupAbilitiesDropDownMenu();
+        refreshDropDown();
         setAbility();
         checkPlayerTurn();
         pointerHand.transform.position = currentTurnTaker.transform.position + pointerHandOffset;
+    }
+
+    private void refreshDropDown(int newValue = 0)
+    {
+        if (abilityCoolDown == null)
+            abilityCoolDown = GameObject.Find("AbilityDropDownMenu").GetComponent<AbilityCoolDown>();
+        abilityCoolDown = GetComponent<AbilityCoolDown>();
+        abilityDropDownMenu.value = newValue;
+        abilityDropDownMenu.RefreshShownValue();
+    }
+
+    public void setAbility()
+    {
+        int abilityNumber = abilityDropDownMenu.value;
+        CurrentAbility = currentTurnTaker.abilities[abilityNumber];
+        abilityCoolDown.ability = CurrentAbility;
     }
     
     // Update is called once per frame
@@ -137,6 +185,11 @@ public class BattleManager : MonoBehaviour
 
     private void takeEnemyTurn()
     {
+        if (AllFriendlies.Count == 0)
+        {
+            Debug.Log("No players detected");
+            return;
+        }
         //Initialize enemy turn
         enemyTurnInitialized = true;
         //Select ability
@@ -324,13 +377,27 @@ public class BattleManager : MonoBehaviour
         {
             //Lose
             Debug.Log("You lost, better luck next time!");
+            bigInfoText.gameObject.SetActive(true);
             bigInfoText.text = "You lost, better luck next time!";
+            StartCoroutine(changeScene("Main", 3));
         } 
     }
 
     IEnumerator changeScene(string sceneToChangeTo, int waitForSeconds = 3)
     {
         yield return new WaitForSeconds(waitForSeconds);
+        foreach (var characterScript in _CharacterScriptsFromMap)
+        {
+            if (characterScript.transform.CompareTag("BattleParticipant"))
+            {
+                if (characterScript.hostility == CharacterScript.HostilityToPlayer.Enemy)
+                characterScript.transform.parent = enemyParent; //reattach enemies to their map parent object.
+                else if (characterScript.hostility == CharacterScript.HostilityToPlayer.Friendly)
+                {
+                    characterScript.transform.parent = playerParent; //reattach players to their map parent object
+                }
+            }
+        }
         GameManager.instance.ChangeToNewScene(sceneToChangeTo);
     }
 

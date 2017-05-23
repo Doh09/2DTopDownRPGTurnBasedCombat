@@ -12,7 +12,7 @@ public class SelectedCharacterInfo : MonoBehaviour
     public GameObject display_Str;
     public GameObject display_Int;
     public GameObject display_Spd;
-    public GameObject display_portrait;
+    public GameObject display_Portrait;
     public GameObject display_Healthbar;
 
     // Use this for initialization
@@ -29,15 +29,25 @@ public class SelectedCharacterInfo : MonoBehaviour
             {
                 //Display target info
                 //Name
+                if (display_Name == null)
+                    display_Name = GameObject.Find("display_Name");
                 display_Name.GetComponent<Text>().text = bm.selectedTargetToAttack.characterName;
                 //Strength
+                if (display_Str == null)
+                    display_Str = GameObject.Find("display_Str");
                 display_Str.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.strength + "";
                 //Intelligence
+                if (display_Int == null)
+                    display_Int = GameObject.Find("display_Int");
                 display_Int.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.intelligence + "";
                 //Speed
+                if (display_Spd == null)
+                    display_Spd = GameObject.Find("display_Spd");
                 display_Spd.GetComponentInChildren<Text>().text = bm.selectedTargetToAttack.speed + "";
                 //Portrait
-                display_portrait.GetComponentInChildren<Image>().sprite = bm.selectedTargetToAttack.portrait;
+                if (display_Portrait == null)
+                    display_Portrait = GameObject.Find("display_Portrait");
+                display_Portrait.GetComponentInChildren<Image>().sprite = bm.selectedTargetToAttack.portrait;
                 //Healthbar
             }
         }

@@ -51,7 +51,8 @@ public class CharacterScript : MonoBehaviour
         }
         
         HP_Bar_Foreground.transform.localScale = initialScale*scale;
-        GetComponent<Animator>().SetFloat("HP", hp);
+        if (GetComponent<Animator>() != null)
+            GetComponent<Animator>().SetFloat("HP", hp);
     }
 
     public enum HostilityToPlayer

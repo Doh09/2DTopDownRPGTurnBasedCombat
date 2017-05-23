@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
 
         if (sceneChangeInitialized && simpleBlit.currentValue >= 1f)
         {
-            SceneManager.LoadScene("BattleScene");
+            SceneManager.LoadScene(sceneToLoadTo);
             sceneChangeInitialized = false;
         }
     }
@@ -70,6 +70,7 @@ public class GameManager : MonoBehaviour
         simpleBlit.Activated = true;
         sceneChangeInitialized = true;
         Debug.Log("LoadMe");
+        camera = null;
     }
 
     public List<Transform> GetCharactersTransforms()

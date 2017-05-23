@@ -16,11 +16,14 @@ public class MainMenuButtons : MonoBehaviour {
 	}
 	
 	public void startLevel(){
-		if(PlayerPrefs.HasKey("map")){
-			SceneManager.LoadScene (PlayerPrefs.GetInt("map")); //Should be changed to use GameManagers scene load also.
+        if (PlayerPrefs.HasKey("map"))
+        {
+            SceneManager.LoadScene(PlayerPrefs.GetInt("map")); //Should be changed to use GameManagers scene load also.
 
-		} else
-		{
+        }
+        else
+        {
+            Debug.Log("Play was clicked");
 		    GameManager.instance.ChangeToNewScene("Main");
 		}
 	}
