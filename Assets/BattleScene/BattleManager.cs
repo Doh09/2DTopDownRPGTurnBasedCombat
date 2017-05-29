@@ -394,10 +394,13 @@ public class BattleManager : MonoBehaviour
                 characterScript.transform.parent = enemyParent; //reattach enemies to their map parent object.
                 else if (characterScript.hostility == CharacterScript.HostilityToPlayer.Friendly)
                 {
+                    GameObject.Destroy(characterScript.gameObject);
                     characterScript.transform.parent = playerParent; //reattach players to their map parent object
                 }
             }
         }
+
+        GameObject.Destroy(enemyParent.root.gameObject);
         GameManager.instance.ChangeToNewScene(sceneToChangeTo);
     }
 
