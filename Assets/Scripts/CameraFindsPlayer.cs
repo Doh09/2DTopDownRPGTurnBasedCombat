@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DontDestoryPlayer : MonoBehaviour {
-
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
+public class CameraFindsPlayer : MonoBehaviour {
 
 	// Use this for initialization
-	void Start () {
-		
+	void Start ()
+	{
+	    transform.parent = GameObject.Find("Player").transform;
 	}
 	
 	// Update is called once per frame

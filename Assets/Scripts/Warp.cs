@@ -10,9 +10,17 @@ public class Warp : MonoBehaviour {
 	public string scene;
 	public float posX;
 	public float posY;
+    public Vector3 offSet;
 	//public float posZ;
 
-	void OnTriggerEnter2D(Collider2D other){
+    void OnEnable()
+    {
+        player = GameManager.instance.GetPlayer().transform;
+    }
+
+    void OnTriggerEnter2D(Collider2D other){
+        DontDestroyOnLoad(player);
+        player.position = new Vector3(posX, posY, 0) + offSet;
         SceneManager.LoadScene (scene);
 		PlayerPrefs.SetFloat ("x", posX);
 		PlayerPrefs.SetFloat ("y", posY);

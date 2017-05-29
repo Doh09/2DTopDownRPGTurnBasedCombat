@@ -16,6 +16,7 @@ public class ButtonExtend : MonoBehaviour {
 
     public void CallGameManagerToChangeToMenu()
     {
+        Destroy(GameManager.instance.GetPlayer()); //Reset player.
         GameManager.instance.ChangeToNewScene("Menu");
     }
 }

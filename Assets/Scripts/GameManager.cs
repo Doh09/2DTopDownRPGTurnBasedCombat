@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     private Camera camera;
     private bool sceneChangeInitialized = false;
     private SimpleBlit simpleBlit;
+    private GameObject player;
+    public string previousSceneName;
 
     private List<Transform> _charactersTransforms;
 
@@ -22,29 +24,50 @@ public class GameManager : MonoBehaviour
     {
         if (instance == null)
         {
+            SceneManager.sceneLoaded += onSceneLoaded;
             instance = this;
         }
         else if (instance != null)
         {
             if (instance != this)
-            Destroy(gameObject);
+                Destroy(gameObject);
         }
         DontDestroyOnLoad(gameObject);
     }
 
-	// Use this for initialization
-	void Start ()
-	{
-	    camera = Camera.main;
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    // Use this for initialization
+    void Start()
+    {
+        camera = Camera.main;
+        GetPlayer();
+    }
+
+    public GameObject GetPlayer()
+    {
+        if (player == null)
+            player = GameObject.Find("Player");
+        return player;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
 
         if (sceneChangeInitialized && simpleBlit.currentValue >= 1f)
         {
+            previousSceneName = SceneManager.GetActiveScene().name;
             SceneManager.LoadScene(sceneToLoadTo);
             sceneChangeInitialized = false;
+
+        }
+    }
+
+    void onSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (!SceneManager.GetActiveScene().Equals("BattleScene"))
+        {
+            if (player != null)
+            player.SetActive(true);
         }
     }
 
@@ -75,7 +98,7 @@ public class GameManager : MonoBehaviour
 
     public List<Transform> GetCharactersTransforms()
     {
-        return _charactersTransforms;    
+        return _charactersTransforms;
     }
 
 }

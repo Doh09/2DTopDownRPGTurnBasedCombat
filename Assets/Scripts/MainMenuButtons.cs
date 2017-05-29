@@ -24,6 +24,7 @@ public class MainMenuButtons : MonoBehaviour {
         else
         {
             Debug.Log("Play was clicked");
+            GameObject.Find("Player").transform.position = new Vector3(0,0,0);
 		    GameManager.instance.ChangeToNewScene("Main");
 		}
 	}

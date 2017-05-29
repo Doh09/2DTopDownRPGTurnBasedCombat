@@ -371,7 +371,7 @@ public class BattleManager : MonoBehaviour
             Debug.Log("You won, well done!");
             bigInfoText.gameObject.SetActive(true);
             bigInfoText.text = "You won, well done!";
-            StartCoroutine(changeScene("Main", 3));
+            StartCoroutine(changeScene(GameManager.instance.previousSceneName, 3));
         }
         else if (AllFriendlies.Count == 0)
         {
@@ -379,25 +379,25 @@ public class BattleManager : MonoBehaviour
             Debug.Log("You lost, better luck next time!");
             bigInfoText.gameObject.SetActive(true);
             bigInfoText.text = "You lost, better luck next time!";
-            StartCoroutine(changeScene("Main", 3));
+            StartCoroutine("Menu", 3);
         } 
     }
 
     IEnumerator changeScene(string sceneToChangeTo, int waitForSeconds = 3)
     {
         yield return new WaitForSeconds(waitForSeconds);
-        foreach (var characterScript in _CharacterScriptsFromMap)
+        foreach (var characterScript in AllFriendlies)
         {
             if (characterScript.transform.CompareTag("BattleParticipant"))
-            {
-                if (characterScript.hostility == CharacterScript.HostilityToPlayer.Enemy)
-                characterScript.transform.parent = enemyParent; //reattach enemies to their map parent object.
-                else if (characterScript.hostility == CharacterScript.HostilityToPlayer.Friendly)
-                {
-                    GameObject.Destroy(characterScript.gameObject);
-                    characterScript.transform.parent = playerParent; //reattach players to their map parent object
-                }
-            }
+                characterScript.transform.parent = playerParent; //reattach players to their map parent object
+            
+        }
+        foreach (var characterScript in DeadFighters)
+        {
+            if (characterScript.transform.CompareTag("BattleParticipant") 
+                && characterScript.hostility == CharacterScript.HostilityToPlayer.Friendly)
+                characterScript.transform.parent = playerParent; //reattach players to their map parent object
+
         }
 
         GameObject.Destroy(enemyParent.root.gameObject);
