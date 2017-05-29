@@ -379,7 +379,7 @@ public class BattleManager : MonoBehaviour
             Debug.Log("You lost, better luck next time!");
             bigInfoText.gameObject.SetActive(true);
             bigInfoText.text = "You lost, better luck next time!";
-            StartCoroutine("Menu", 3);
+            StartCoroutine(changeScene("Menu", 3));
         } 
     }
 
